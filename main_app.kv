@@ -1,5 +1,22 @@
 #:kivy 2.0.0
 
+<MD3Card>
+	padding: 4
+	size_hint: None, None
+	size: "200dp", "100dp"
+
+	MDRelativeLayout:
+
+		MDLabel:
+			id: card_label
+			text: ''
+			#adaptive_size: True
+			color: "black"
+			halign: "center"
+
+
+
+
 <Touch>:
 	MDNavigationLayout:
 		ScreenManager:
@@ -49,7 +66,14 @@
 								text: "Leave"
 								on_press: app.game.leave()
 					MDBoxLayout:
+						padding: 10
 						size_hint_y: .9
+						ScrollView:
+							GridLayout:
+								padding: 10
+								spacing: 10
+								cols: 2
+								id: card_list_player
 				
 			# GAME_HOST
 
@@ -74,7 +98,7 @@
 								on_press: app.game.list_rooms()
 					MDBoxLayout:
 						padding: 10
-						size_hint_y: .4
+						size_hint_y: .2
 						ScrollView:
 							MDLabel:
 								id: host_label
@@ -83,7 +107,16 @@
 								height: self.texture_size[1]
 								text_size: self.width, None
 					MDBoxLayout:
+						padding: 10
 						size_hint_y: .9
+						ScrollView:
+							GridLayout:
+								padding: 10
+								spacing: 10
+								cols: 2
+								id: card_list_host
+					#MDBoxLayout:
+					#	size_hint_y: .9
 
 
 			# SETTINGS

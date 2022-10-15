@@ -10,6 +10,7 @@ class CAH:
 		self.db = DB('cah/cah-cards-full-official.json')
 		self.mode = 'player' # 'host'
 		self.client = None
+		self.player = None
 		self.udp_server = None
 		self.is_shut = False
 		# default settings
@@ -55,6 +56,7 @@ class CAH:
 		self.client.leave_room()
 		self.client.stop()
 		self.client = None
+		self.player = None
 		self.is_shut = True
 
 	def stop_client(self):
