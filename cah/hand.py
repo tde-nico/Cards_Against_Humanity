@@ -15,15 +15,10 @@ class Hand:
 			#print(card)
 			self.cards.append(card)
 
-	def pick(self, index_or_card):
+	def pick(self, index):
 		card = None
 		if self.cards:
-			if type(index_or_card) == int:
-				card = self.cards.pop(index_or_card)
-			elif type(index_or_card) == str:
-				for c in self.cards:
-					if c['text'] == index_or_card:
-						self.cards.remove(c)
+			card = self.cards.pop(index)
 		return card
 
 	def get_hand(self):

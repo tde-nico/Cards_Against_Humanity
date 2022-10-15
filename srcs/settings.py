@@ -15,9 +15,8 @@ kivy.require('2.0.0')
 TITLE = "Card Against Humanity"
 DEVELOPER = "tde-nico"
 GIT = "https://github.com/tde-nico"
-VERSION = "1.0.0"
+VERSION = "0.0.1"
 SETTINGS_FILE = 'settings.json'
-PORT = 1235
 
 PLATFORM = kivy.utils.platform
 SETTINGS = dict()
@@ -37,6 +36,9 @@ def load(fname):
 		data = json.load(f)
 	return data
 
+def debug(error):
+	with open(SETTINGS['download'] + '/log.txt', 'w') as d:
+		d.write(error)
 
 
 
@@ -45,13 +47,19 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 if PLATFORM == 'android':
-	pass
 	# request permissions for android
-	#from android.permissions import request_permissions, Permission
-	#request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
+	from android.permissions import request_permissions, Permission
+	request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
 	# storage permissions
+	from android.storage import primary_external_storage_path
+	common_dir = primary_external_storage_path()
+	# default download folder
 else:
 	kivy.core.window.Window.size = (450, 700)
+	common_dir = os.getcwd()
+	common_dir = common_dir.replace("\\", "/")
+	if not os.path.exists(common_dir + "/Download"):
+		os.mkdir(common_dir + "/Download")
 
 
 
@@ -67,6 +75,7 @@ COLORS = ['Red','Pink','Purple','DeepPurple','Indigo','Blue','LightBlue','Cyan',
 
 
 def reset_settings():
+	#SETTINGS = DEFAULTS
 	for key, item in DEFAULTS.items():
 		SETTINGS[key] = item
 	dump(SETTINGS_FILE, SETTINGS)

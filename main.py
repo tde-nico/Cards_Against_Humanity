@@ -1,6 +1,5 @@
 from srcs import *
 from cah.cah import CAH
-import sys
 
 
 class Touch(MDScreen):
@@ -20,7 +19,7 @@ class main_app(MDApp):
 		self.info = None
 		self.settings = Settings(self)
 		self.home = Home(self)
-		self.cah = CAH(PORT)
+		self.cah = CAH()
 		self.game = Game(self)
 		return Touch()
 
@@ -52,6 +51,4 @@ class main_app(MDApp):
 
 
 if __name__ == '__main__':
-	if len(sys.argv) > 1:
-		PORT += len(sys.argv) - 1
 	main_app().run()

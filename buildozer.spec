@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = "Card Against Humanity"
+title = "Multi Mail"
 
 # (str) Package name
-package.name = cah
+package.name = multi_mail
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.test
@@ -20,7 +20,7 @@ source.include_exts = py,png,jpg,kv,atlas,ico
 
 # (list) Source files to exclude (let empty to not exclude anything)
 #source.exclude_exts = Makefile
-source.exclude_exts = Makefile test.py
+source.exclude_exts = Makefile
 
 # (list) List of directory to exclude (let empty to not exclude anything)
 #source.exclude_dirs = tests, bin
@@ -30,7 +30,7 @@ source.exclude_dirs = tests, bin
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 1.0.0
+version = 0.0.1
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
