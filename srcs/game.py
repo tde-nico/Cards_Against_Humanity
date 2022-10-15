@@ -26,5 +26,6 @@ class Game:
 	
 
 	def list_rooms(self):
-		self.app.cah.list_rooms()
+		text = self.app.cah.list_rooms()
+		self.app.root.ids['host_label'].text = text
 

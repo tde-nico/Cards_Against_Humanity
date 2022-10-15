@@ -73,6 +73,16 @@
 								text: "List"
 								on_press: app.game.list_rooms()
 					MDBoxLayout:
+						padding: 10
+						size_hint_y: .4
+						ScrollView:
+							MDLabel:
+								id: host_label
+								text: ''
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+					MDBoxLayout:
 						size_hint_y: .9
 
 

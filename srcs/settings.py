@@ -17,6 +17,7 @@ DEVELOPER = "tde-nico"
 GIT = "https://github.com/tde-nico"
 VERSION = "0.0.1"
 SETTINGS_FILE = 'settings.json'
+PORT = 1235
 
 PLATFORM = kivy.utils.platform
 SETTINGS = dict()
