@@ -1,0 +1,304 @@
+#:kivy 2.0.0
+
+<MD3Card>
+	padding: 4
+	size_hint: None, None
+	size: "200dp", "100dp"
+
+	MDRelativeLayout:
+
+		MDLabel:
+			id: card_label
+			text: ''
+			#adaptive_size: True
+			color: "black"
+			halign: "center"
+
+
+
+
+<Touch>:
+	MDNavigationLayout:
+		ScreenManager:
+			id: screen_manager
+
+			# HOME
+
+			MDScreen:
+				name: "home"
+				BoxLayout:
+					orientation: "vertical"
+					MDTopAppBar:
+						title: app.title
+						elevation: 10
+						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+					GridLayout:
+						cols: 1
+						padding: '5dp'
+						spacing: '5dp'
+						size_hint_y: .1
+						MDBoxLayout:
+							padding: '5dp'
+							spacing: '5dp'
+							MDFillRoundFlatButton:
+								text: "Host"
+								on_press: app.game.open('host')
+							MDFillRoundFlatButton:
+								text: "Join"
+								on_press: app.game.open('player')
+					MDBoxLayout:
+						size_hint_y: .9
+
+
+			# GAME_PLAYER
+
+			MDScreen:
+				name: "game_player"
+				BoxLayout:
+					orientation: "vertical"
+					MDTopAppBar:
+						title: app.title
+						elevation: 10
+						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+					GridLayout:
+						cols: 3
+						padding: '5dp'
+						size_hint_y: .1
+						MDBoxLayout:
+							size_hint_x: .1
+							padding: '5dp'
+							spacing: '5dp'
+							MDFillRoundFlatButton:
+								text: "Leave"
+								on_press: app.game.leave()
+							MDFillRoundFlatButton:
+								text: "Select"
+								on_press: app.game.select_cards()
+						MDBoxLayout:
+							size_hint_x: .9
+						MDBoxLayout:
+							size_hint_x: .1
+							MDLabel:
+								id: player_points_label
+								text: '0'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .2
+						MDBoxLayout:
+							size_hint_x: .3
+						MDBoxLayout:
+							size_hint_x: .3
+							MDLabel:
+								id: player_label
+								text: 'Waiting Room'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+						MDBoxLayout:
+							size_hint_x: .3
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .1
+						MDBoxLayout:
+							size_hint_x: .2
+						MDBoxLayout:
+							size_hint_x: .4
+							padding: 10
+							spacing: 10
+							cols: 2
+							id: black_card_player
+						MDBoxLayout:
+							size_hint_x: .2
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .9
+						ScrollView:
+							GridLayout:
+								padding: 10
+								spacing: 10
+								cols: 2
+								id: card_list_player
+				
+			# GAME_HOST
+
+			MDScreen:
+				name: "game_host"
+				BoxLayout:
+					orientation: "vertical"
+					MDTopAppBar:
+						title: app.title
+						elevation: 10
+						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+					GridLayout:
+						cols: 3
+						padding: '5dp'
+						size_hint_y: .1
+						MDBoxLayout:
+							orientation: "horizontal"
+							size_hint_x: .1
+							padding: '5dp'
+							spacing: '5dp'
+							MDFillRoundFlatButton:
+								text: "Shut"
+								on_press: app.game.shut()
+							MDFillRoundFlatButton:
+								text: "List"
+								on_press: app.game.list_rooms()
+							MDFillRoundFlatButton:
+								text: "Start"
+								on_press: app.game.start_hosted_game()
+							MDFillRoundFlatButton:
+								text: "Select"
+								on_press: app.game.select_cards()
+						MDBoxLayout:
+							size_hint_x: .9
+						MDBoxLayout:
+							size_hint_x: .1
+							MDLabel:
+								id: host_points_label
+								text: '0'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .2
+						ScrollView:
+							MDLabel:
+								id: host_label
+								text: ''
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .1
+						MDBoxLayout:
+							size_hint_x: .2
+						MDBoxLayout:
+							size_hint_x: .4
+							padding: 10
+							spacing: 10
+							cols: 2
+							id: black_card_host
+						MDBoxLayout:
+							size_hint_x: .2
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .9
+						ScrollView:
+							GridLayout:
+								padding: 10
+								spacing: 10
+								cols: 2
+								id: card_list_host
+					#MDBoxLayout:
+					#	size_hint_y: .9
+
+
+			# SETTINGS
+
+			MDScreen:
+				name: "settings"
+				BoxLayout:
+					orientation: "vertical"
+					MDTopAppBar:
+						title: "Settings"
+						elevation: 10
+						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+					GridLayout:
+						cols: 1
+						padding: '20dp'
+
+						MDBoxLayout:
+							padding: '10dp'
+							orientation: "horizontal"
+							size_hint_y: .1
+							MDLabel:
+								text: "Dark mode"
+								pos_hint: {'x':0.1, 'y':0}
+							MDSwitch:
+								id: theme
+								pos_hint: {'x':0.9, 'y':0}
+								on_active: app.settings.change_theme()
+
+						MDBoxLayout:
+							padding: '10dp'
+							orientation: "horizontal"
+							size_hint_y: .1
+							MDLabel:
+								text: "Palette"
+								pos_hint: {'x':0.1, 'y':0}
+							MDDropDownItem:
+								id: palette
+								pos_hint: {'x':0.9, 'y':0.2}
+								text: ''
+								on_release: app.settings.palette_menu.open()
+
+						MDBoxLayout:
+							size_hint_y: .5
+
+						MDBoxLayout:
+							orientation: "horizontal"
+							size_hint_y: .1
+							MDBoxLayout:
+								size_hint_y: .4
+							MDFillRoundFlatButton:
+								text: "Reset Default Settings"
+								on_press: app.settings.reset()
+							MDBoxLayout:
+								size_hint_y: .4
+
+		# NAV DRAWER
+
+		MDNavigationDrawer:
+			id: nav_drawer
+			radius: (0, 16, 16, 0) if self.anchor == "left" else (16, 0, 0, 16)
+			BoxLayout:
+				orientation: "vertical"
+				padding: "8dp"
+				spacing: "8dp"
+				MDLabel:
+					text: app.title
+					font_style: "Button"
+					size_hint_y: None
+					height: self.texture_size[1]
+				ScrollView:
+					MDList:
+
+						MDNavigationDrawerItem:
+							text: "Home"
+							icon: "home"
+							theme_text_color: 'Primary'
+							on_press: app.home.open()
+
+
+						MDNavigationDrawerDivider:
+
+						MDNavigationDrawerItem:
+							text: "Settings"
+							icon: "cog"
+							theme_text_color: 'Primary'
+							on_press: app.settings.open()
+
+						MDNavigationDrawerItem:
+							text: "Info"
+							icon: "information-outline"
+							theme_text_color: 'Primary'
+							on_press: app.show_info()
+
+						MDNavigationDrawerItem:
+							text: "Exit"
+							icon: "exit-to-app"
+							theme_text_color: 'Primary'
+							on_press: app.exit()
+

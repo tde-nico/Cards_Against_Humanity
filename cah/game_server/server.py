@@ -4,7 +4,7 @@ import socket
 import json
 import time
 from threading import Thread, Lock
-from rooms import Rooms, RoomNotFound,NotInRoom, RoomFull
+from .rooms import Rooms, RoomNotFound,NotInRoom, RoomFull
 
 
 
@@ -226,7 +226,7 @@ class TcpServer(Thread):
 
 
 
-def deploy(tcp_port, udp_port, room_capacity=None):
+def start_server(tcp_port, udp_port, room_capacity=None):
 	if room_capacity is None:
 		rooms = Rooms(1)
 	else:
@@ -236,6 +236,20 @@ def deploy(tcp_port, udp_port, room_capacity=None):
 	tcp_server = TcpServer(tcp_port, rooms, lock)
 	udp_server.start()
 	tcp_server.start()
+	return udp_server, tcp_server
+
+
+def stop_server(udp_server, tcp_server):
+	udp_server.join()
+	tcp_server.join()
+
+
+
+
+
+def main(tcp_port, udp_port, room_capacity):
+	udp_server, tcp_server = start_server(tcp_port, udp_port, room_capacity)
+	rooms = udp_server.rooms
 	is_running = True
 
 	print("Game Server.")
@@ -285,8 +299,7 @@ def deploy(tcp_port, udp_port, room_capacity=None):
 			tcp_server.is_listening = False
 			is_running = False
 	
-	udp_server.join()
-	tcp_server.join()
+	stop_server(udp_server, tcp_server)
 
 
 
@@ -313,5 +326,5 @@ if __name__ == '__main__':
 		default='3')
 	
 	args = parser.parse_args()
-	deploy(int(args.tcp_port), int(args.udp_port), int(args.room_capacity))
+	main(int(args.tcp_port), int(args.udp_port), int(args.room_capacity))
 

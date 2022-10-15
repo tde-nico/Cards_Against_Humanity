@@ -1,0 +1,5 @@
+.buildozer/
+tests/
+__pycache__
+
+*.pyc

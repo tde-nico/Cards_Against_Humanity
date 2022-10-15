@@ -86,6 +86,10 @@ class Client:
 		self.server_message = []
 		return set(message)
 
+	def stop(self):
+		self.server_listener.stop()
+		self.server_listener.join()
+
 
 
 class SockThread(threading.Thread):
@@ -95,17 +99,22 @@ class SockThread(threading.Thread):
 		self.lock = lock
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 		self.sock.bind(addr)
+		self.is_running = True
 	
 	def run(self):
-		while True:
-			data, addr = self.sock.recvfrom(1024)
-			self.lock.acquire()
+		while self.is_running:
 			try:
-				self.client.server_message.append(data)
-			finally:
-				self.lock.release()
+				data, addr = self.sock.recvfrom(1024)
+				self.lock.acquire()
+				try:
+					self.client.server_message.append(data)
+				finally:
+					self.lock.release()
+			except OSError:
+				pass
 	
 	def stop(self):
+		self.is_running = False
 		self.sock.close()
 
 
@@ -146,18 +155,6 @@ if __name__ == '__main__':
 	client2.sendto(client.identifier, {"name": "SUS", "message": "MIMMI"})
 	client3.send({"name": "mogus", "message": "hello"})
 
-	'''
-	messages = client.get_messages()
-
-	print(messages)
-	if messages:
-		for message in messages:
-			print(message)
-			message = json.loads(message)
-			sender, value = message.popitem()
-			print("%s say %s" % (value["name"], value["message"]))
-	'''
-
 	for i in range(10):
 		#  Send message to room (any serializable data)
 		client.send({"name": "A",
@@ -181,5 +178,8 @@ if __name__ == '__main__':
 	client2.leave_room()
 	client3.leave_room()
 
-	exit()
+
+	client.stop()
+	client2.stop()
+	client3.stop()
 
