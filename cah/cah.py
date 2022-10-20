@@ -26,19 +26,20 @@ class CAH:
 	def start_server(self):
 		self.udp_server, self.tcp_server = start_server(
 			self.tcp_port, self.udp_port, self.room_capacity)
+		self.rooms = self.udp_server.rooms
 
 
 	def _stop_server(self):
-		self.is_shut = False
 		while self.is_shut:
 			sleep(0.1)
 		if not self.udp_server:
 			return
+		self.is_shut = True
 		self.udp_server.is_listening = False
 		self.tcp_server.is_listening = False
 		stop_server(self.udp_server, self.tcp_server)
 		self.udp_server = self.tcp_server = None
-		self.is_shut = True
+		self.is_shut = False
 
 	def stop_server(self):
 		if self.udp_server:
@@ -52,12 +53,15 @@ class CAH:
 			sleep(0.1)
 		if not self.client:
 			return
-		self.is_shut = False
-		self.client.leave_room()
+		self.is_shut = True
+		try:
+			self.client.leave_room()
+		except:
+			pass
 		self.client.stop()
 		self.client = None
 		self.player = None
-		self.is_shut = True
+		self.is_shut = False
 
 	def stop_client(self):
 		if self.client:
@@ -67,9 +71,8 @@ class CAH:
 
 
 	def list_rooms(self):
-		rooms = self.udp_server.rooms
 		text = 'Rooms:\n'
-		for room_id, room in rooms.rooms.items():
+		for room_id, room in self.rooms.rooms.items():
 			text += ("%s - %s (%d/%d)" % (room.identifier,room.name,len(room.players),room.capacity))
 		return text
 

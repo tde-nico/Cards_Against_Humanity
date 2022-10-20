@@ -35,8 +35,11 @@
 					GridLayout:
 						cols: 1
 						padding: '5dp'
+						spacing: '5dp'
 						size_hint_y: .1
 						MDBoxLayout:
+							padding: '5dp'
+							spacing: '5dp'
 							MDFillRoundFlatButton:
 								text: "Host"
 								on_press: app.game.open('host')
@@ -58,13 +61,39 @@
 						elevation: 10
 						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
 					GridLayout:
-						cols: 1
+						cols: 3
 						padding: '5dp'
 						size_hint_y: .1
 						MDBoxLayout:
+							size_hint_x: .1
 							MDFillRoundFlatButton:
 								text: "Leave"
 								on_press: app.game.leave()
+						MDBoxLayout:
+							size_hint_x: .9
+						MDBoxLayout:
+							size_hint_x: .1
+							MDLabel:
+								id: host_points_label
+								text: '0'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .1
+						MDBoxLayout:
+							size_hint_x: .3
+						MDBoxLayout:
+							size_hint_x: .3
+							MDLabel:
+								id: player_label
+								text: 'Waiting Room'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+						MDBoxLayout:
+							size_hint_x: .3
 					MDBoxLayout:
 						padding: 10
 						size_hint_y: .9
@@ -86,16 +115,34 @@
 						elevation: 10
 						left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
 					GridLayout:
-						cols: 1
+						cols: 3
 						padding: '5dp'
 						size_hint_y: .1
 						MDBoxLayout:
+							orientation: "horizontal"
+							size_hint_x: .1
+							padding: '5dp'
+							spacing: '5dp'
 							MDFillRoundFlatButton:
 								text: "Shut"
 								on_press: app.game.shut()
 							MDFillRoundFlatButton:
 								text: "List"
 								on_press: app.game.list_rooms()
+							MDFillRoundFlatButton:
+								text: "Start"
+								on_press: app.game.start_game()
+						MDBoxLayout:
+							size_hint_x: .9
+						MDBoxLayout:
+							size_hint_x: .1
+							MDLabel:
+								id: host_points_label
+								text: '0'
+								size_hint_y: None
+								height: self.texture_size[1]
+								text_size: self.width, None
+
 					MDBoxLayout:
 						padding: 10
 						size_hint_y: .2
@@ -106,6 +153,7 @@
 								size_hint_y: None
 								height: self.texture_size[1]
 								text_size: self.width, None
+
 					MDBoxLayout:
 						padding: 10
 						size_hint_y: .9
