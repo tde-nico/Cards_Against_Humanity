@@ -8,11 +8,18 @@ import threading
 
 
 class MD3Card(MDCard):
-	text = StringProperty()
+	#text = StringProperty()
 
-	def on_touch_up(self, touch):
-		#self.md_bg_color = '#cccccc'
-		pass
+	def set_attributes(self, game, color):
+		self.game = game
+		self.card_color = color
+
+	def on_press(self):
+		if self.card_color == 'black':
+			return
+		self.game.set_card_selection(self)
+		#print(self.ids['card_label'].text)
+		return super().on_press()
 
 
 class Game:
@@ -23,6 +30,7 @@ class Game:
 
 	def set_defaults(self):
 		self.md_cards = []
+		self.selected_cards = []
 		self.czar = None
 		self.host = None
 		self.app.root.ids[f'card_list_{self.mode}'].clear_widgets()
@@ -75,8 +83,22 @@ class Game:
 				md_bg_color="#eeeeee",
 			)
 			mdcard.ids['card_label'].text = card['text']
+			mdcard.set_attributes(self, 'white')
 			self.md_cards.append(mdcard)
 			self.app.root.ids[f'card_list_{self.mode}'].add_widget(mdcard)
+
+		mdcard = MD3Card(
+			line_color=(0.2, 0.2, 0.2, 0.8),
+			style="filled",
+			padding="4dp",
+			size_hint=(None, None),
+			size=("200dp", "100dp"),
+			md_bg_color="#222222",
+		)
+		mdcard.ids['card_label'].text = self.black_card['text']
+		mdcard.ids['card_label'].color = 'white'
+		mdcard.set_attributes(self, 'black')
+		self.app.root.ids[f'black_card_{self.mode}'].add_widget(mdcard)
 
 
 	def start_game(self):
@@ -99,7 +121,7 @@ class Game:
 			if value.get('message', None) == 'leave':
 				self.leave()
 				return
-			self.czar = value['czar']
+			self.czar, self.black_card = value['czar'], value['card']
 			self.host = sender
 			self.app.root.ids['player_label'].text = ''
 		self.generate_cards()
@@ -125,4 +147,22 @@ class Game:
 
 	def set_czar(self):
 		self.czar = random.choice(list(self.cah.rooms.players.keys()))
-		self.cah.client.send({'czar': self.czar})
+		self.black_card = self.cah.db.draw('black')
+		self.cah.client.send({'czar': self.czar, 'card': self.black_card})
+
+
+	def select_cards(self):
+		print(self.black_card['pick'])
+		print(self.selected_cards)
+		#self.selected_cards = []
+
+
+	def set_card_selection(self, mdcard):
+		text = mdcard.ids['card_label'].text
+		if text in self.selected_cards:
+			self.selected_cards.remove(text)
+			mdcard.md_bg_color = '#eeeeee'
+		else:
+			self.selected_cards.append(text)
+			mdcard.md_bg_color = '#bbbbbb'
+

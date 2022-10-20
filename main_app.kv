@@ -69,6 +69,9 @@
 							MDFillRoundFlatButton:
 								text: "Leave"
 								on_press: app.game.leave()
+							MDFillRoundFlatButton:
+								text: "Select"
+								on_press: app.game.select_cards()
 						MDBoxLayout:
 							size_hint_x: .9
 						MDBoxLayout:
@@ -132,6 +135,9 @@
 							MDFillRoundFlatButton:
 								text: "Start"
 								on_press: app.game.start_game()
+							MDFillRoundFlatButton:
+								text: "Select"
+								on_press: app.game.select_cards()
 						MDBoxLayout:
 							size_hint_x: .9
 						MDBoxLayout:
@@ -153,6 +159,20 @@
 								size_hint_y: None
 								height: self.texture_size[1]
 								text_size: self.width, None
+
+					MDBoxLayout:
+						padding: 10
+						size_hint_y: .1
+						MDBoxLayout:
+							size_hint_x: .2
+						MDBoxLayout:
+							size_hint_x: .4
+							padding: 10
+							spacing: 10
+							cols: 2
+							id: black_card_host
+						MDBoxLayout:
+							size_hint_x: .2
 
 					MDBoxLayout:
 						padding: 10
