@@ -27,7 +27,7 @@ class Game:
 		self.app = app
 		self.cah = self.app.cah
 
-
+	@mainthread
 	def set_defaults(self):
 		self.md_cards = []
 		self.selected_cards = []
@@ -39,6 +39,9 @@ class Game:
 			self.app.root.ids['player_label'].text = 'Waiting Room'
 		elif self.mode == 'host':
 			self.app.root.ids['host_label'].text = ''
+		self.evaluating = 0
+		self.players = []
+		self.winner = None
 
 
 	def open(self, mode):
@@ -74,19 +77,23 @@ class Game:
 
 	@mainthread
 	def generate_cards(self):
-		for card in self.cah.player.get_hand():
-			mdcard = MD3Card(
-				line_color=(0.2, 0.2, 0.2, 0.8),
-				style="filled",
-				padding="4dp",
-				size_hint=(None, None),
-				size=("200dp", "100dp"),
-				md_bg_color="#eeeeee",
-			)
-			mdcard.ids['card_label'].text = card['text']
-			mdcard.set_attributes(self, 'white')
-			self.md_cards.append(mdcard)
-			self.app.root.ids[f'card_list_{self.mode}'].add_widget(mdcard)
+		self.app.root.ids[f'card_list_{self.mode}'].clear_widgets()
+		self.app.root.ids[f'black_card_{self.mode}'].clear_widgets()
+		#print(self.czar, self.cah.client.identifier)
+		if self.czar != self.cah.client.identifier:
+			for card in self.cah.player.get_hand():
+				mdcard = MD3Card(
+					line_color=(0.2, 0.2, 0.2, 0.8),
+					style="filled",
+					padding="4dp",
+					size_hint=(None, None),
+					size=("200dp", "100dp"),
+					md_bg_color="#eeeeee",
+				)
+				mdcard.ids['card_label'].text = card['text']
+				mdcard.set_attributes(self, 'white')
+				self.md_cards.append(mdcard)
+				self.app.root.ids[f'card_list_{self.mode}'].add_widget(mdcard)
 
 		mdcard = MD3Card(
 			line_color=(0.2, 0.2, 0.2, 0.8),
@@ -100,20 +107,21 @@ class Game:
 		mdcard.ids['card_label'].color = 'white'
 		mdcard.set_attributes(self, 'black')
 		self.app.root.ids[f'black_card_{self.mode}'].add_widget(mdcard)
+		self.app.root.ids[f'{self.mode}_points_label'].text = str(self.cah.player.awesome_points)
+		#print(self.cah.player.awesome_points)
 
 
 	def start_hosted_game(self):
+		self.app.root.ids['host_label'].text = ''
 		self.starter_thread = threading.Thread(target=self.start_game)
 		self.starter_thread.start()
 
-
-	def start_game(self):
-		while not self.cah.player:
-			sleep(0.1)
+	def restart(self):
+		#self.set_defaults()
 		if self.mode == 'host':
 			self.set_czar()
 			self.host = self.cah.client.identifier
-		elif self.mode == 'player':
+		elif self.mode == 'player' and not self.czar:
 			waiting = None
 			while not waiting:
 				if self.cah.client:
@@ -128,9 +136,17 @@ class Game:
 				self.leave()
 				return
 			self.czar, self.black_card = value['czar'], value['card']
+			self.players = value['players']
 			self.host = sender
 			self.app.root.ids['player_label'].text = ''
+		self.cah.player.draw()
+		#print(self.cah.player.get_hand())
 		self.generate_cards()
+
+	def start_game(self):
+		while not self.cah.player:
+			sleep(0.1)
+		self.restart()
 		#if self.mode == 'player':
 		self.wait_commands()
 
@@ -146,32 +162,76 @@ class Game:
 				sleep(0.1)
 			message = json.loads(waiting.pop())
 			sender, value = message.popitem()
+			if value['message'] == 'czar':
+				self.czar, self.black_card = value['czar'], value['card']
+				self.players = value['players']
+				if self.cah.client.identifier == value['winner']:
+					self.cah.player.awesome_points += 1
+				self.restart()
 			if sender == self.host:
 				if value['message'] == 'leave':
 					self.leave()
-			elif self.cah.client.identifier == self.host:
+			if sender == self.czar:
+				#print(value, self.cah.client.identifier)
+				if value['message'] == 'selection':
+					self.evaluation_cards = value['cards']
+					self.selection_mode()
+				elif value['message'] == 'start':
+					if self.cah.client.identifier == value['winner']:
+						self.cah.player.awesome_points += 1
+					self.selected_cards = []
+					self.evaluation_cards = []
+					self.czar = None
+					self.restart()
+			elif self.cah.client.identifier == self.czar:
 				if value['message'] == 'selection':
 					self.evaluation_cards.append([value['cards'], value['identifier']])
-					print(list(self.cah.rooms.rooms.items())[0][1].players, self.evaluation_cards)
-					if len(self.evaluation_cards) == len(list(self.cah.rooms.rooms.items())[0][1].players) - 1:
-						print('selection')
+					#print(list(self.cah.rooms.rooms.items())[0][1].players, self.evaluation_cards)
+					#print(len(self.evaluation_cards), len(list(self.cah.rooms.rooms.items())[0][1].players))
+					if len(self.evaluation_cards) == len(self.players) - 1:
+						self.cah.client.send({'cards': self.evaluation_cards,
+							'identifier': self.cah.client.identifier, 'message': 'selection'})
+						self.evaluating = 1
+						self.selection_mode()
 
 
 	def set_czar(self):
 		self.czar = random.choice(list(self.cah.rooms.players.keys()))
 		self.black_card = self.cah.db.draw('black')
-		self.cah.client.send({'czar': self.czar, 'card': self.black_card})
+		#print(list(self.cah.rooms.rooms.items())[0][1].players)
+		self.players = [player.identifier for player in list(self.cah.rooms.rooms.items())[0][1].players]
+		self.cah.client.send({'czar': self.czar, 'players': self.players,
+			'card': self.black_card, 'message': 'czar', 'winner': self.winner})
 
 
 	def select_cards(self):
 		if len(self.selected_cards) != self.black_card['pick']:
 			return
-		if self.cah.client.identifier != self.host:
-			#print(self.host, self.czar)
-			self.cah.client.sendto(self.host, {'cards': self.selected_cards,
-				'identifier': self.cah.client.identifier, 'message': 'selection'})
+		if not self.evaluating:
+			if self.cah.client.identifier != self.czar:
+				#print(self.host, self.czar)
+				for card in self.selected_cards:
+					self.cah.player.pick(card)
+				self.cah.client.sendto(self.czar, {'cards': self.selected_cards,
+					'identifier': self.cah.client.identifier, 'message': 'selection'})
+				self.app.root.ids[f'card_list_{self.mode}'].clear_widgets()
+			else:
+				self.evaluation_cards.append([self.selected_cards, self.cah.client.identifier])
 		else:
-			self.evaluation_cards.append([self.select_cards, self.cah.client.identifier])
+			for cards, player in self.evaluation_cards:
+				if cards == self.selected_cards:
+					break
+			else:
+				return
+			#print(player)
+			self.winner = player
+			self.cah.client.send({'winner': player,
+				'identifier': self.cah.client.identifier, 'message': 'start'})
+			self.evaluating = 0
+			self.selected_cards = []
+			self.evaluation_cards = []
+			self.restart()
+			#self.evaluation_cards = []
 		#print(self.black_card['pick'])
 		#print(self.selected_cards)
 		self.selected_cards = []
@@ -186,3 +246,20 @@ class Game:
 			self.selected_cards.append(text)
 			mdcard.md_bg_color = '#bbbbbb'
 
+	@mainthread
+	def selection_mode(self):
+		#self.app.root.ids[f'card_list_{self.mode}'].clear_widgets()	
+		for cards, player in self.evaluation_cards:
+			for i in range(self.black_card['pick']):
+				mdcard = MD3Card(
+					line_color=(0.2, 0.2, 0.2, 0.8),
+					style="filled",
+					padding="4dp",
+					size_hint=(None, None),
+					size=("200dp", "100dp"),
+					md_bg_color="#eeeeee",
+				)
+				mdcard.ids['card_label'].text = cards[i]
+				mdcard.set_attributes(self, 'white')
+				self.md_cards.append(mdcard)
+				self.app.root.ids[f'card_list_{self.mode}'].add_widget(mdcard)

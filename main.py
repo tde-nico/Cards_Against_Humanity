@@ -53,5 +53,5 @@ class main_app(MDApp):
 
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
-		PORT += 1
+		PORT += len(sys.argv) - 1
 	main_app().run()

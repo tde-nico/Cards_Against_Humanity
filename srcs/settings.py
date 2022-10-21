@@ -15,7 +15,7 @@ kivy.require('2.0.0')
 TITLE = "Card Against Humanity"
 DEVELOPER = "tde-nico"
 GIT = "https://github.com/tde-nico"
-VERSION = "0.0.1"
+VERSION = "1.0.0"
 SETTINGS_FILE = 'settings.json'
 PORT = 1235
 
