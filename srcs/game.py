@@ -31,6 +31,7 @@ class Game:
 	def set_defaults(self):
 		self.md_cards = []
 		self.selected_cards = []
+		self.evaluation_cards = []
 		self.czar = None
 		self.host = None
 		self.app.root.ids[f'card_list_{self.mode}'].clear_widgets()
@@ -101,6 +102,11 @@ class Game:
 		self.app.root.ids[f'black_card_{self.mode}'].add_widget(mdcard)
 
 
+	def start_hosted_game(self):
+		self.starter_thread = threading.Thread(target=self.start_game)
+		self.starter_thread.start()
+
+
 	def start_game(self):
 		while not self.cah.player:
 			sleep(0.1)
@@ -115,7 +121,7 @@ class Game:
 				else:
 					return
 				sleep(0.1)
-			print(waiting)
+			#print(waiting)
 			message = json.loads(waiting.pop())
 			sender, value = message.popitem()
 			if value.get('message', None) == 'leave':
@@ -125,8 +131,8 @@ class Game:
 			self.host = sender
 			self.app.root.ids['player_label'].text = ''
 		self.generate_cards()
-		if self.mode == 'player':
-			self.wait_commands()
+		#if self.mode == 'player':
+		self.wait_commands()
 
 
 	def wait_commands(self):
@@ -143,6 +149,12 @@ class Game:
 			if sender == self.host:
 				if value['message'] == 'leave':
 					self.leave()
+			elif self.cah.client.identifier == self.host:
+				if value['message'] == 'selection':
+					self.evaluation_cards.append([value['cards'], value['identifier']])
+					print(list(self.cah.rooms.rooms.items())[0][1].players, self.evaluation_cards)
+					if len(self.evaluation_cards) == len(list(self.cah.rooms.rooms.items())[0][1].players) - 1:
+						print('selection')
 
 
 	def set_czar(self):
@@ -152,9 +164,17 @@ class Game:
 
 
 	def select_cards(self):
-		print(self.black_card['pick'])
-		print(self.selected_cards)
-		#self.selected_cards = []
+		if len(self.selected_cards) != self.black_card['pick']:
+			return
+		if self.cah.client.identifier != self.host:
+			#print(self.host, self.czar)
+			self.cah.client.sendto(self.host, {'cards': self.selected_cards,
+				'identifier': self.cah.client.identifier, 'message': 'selection'})
+		else:
+			self.evaluation_cards.append([self.select_cards, self.cah.client.identifier])
+		#print(self.black_card['pick'])
+		#print(self.selected_cards)
+		self.selected_cards = []
 
 
 	def set_card_selection(self, mdcard):
