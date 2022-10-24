@@ -12,3 +12,5 @@ Kivy
 KivyMD
 
 -->
+
+The "card against humanity" game, made with python
