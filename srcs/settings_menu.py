@@ -9,23 +9,27 @@ class Settings:
 
 
 	def open(self):
-		if self.app.theme_cls.theme_style == 'Dark':
-			self.app.root.ids['theme'].active = True
-		self.app.root.ids['palette'].text = SETTINGS['palette']
+		try:
+			debug("settings")
+			if self.app.theme_cls.theme_style == 'Dark':
+				self.app.root.ids['theme'].active = True
+			self.app.root.ids['palette'].text = SETTINGS['palette']
 
-		self.palette_menu = MDDropdownMenu(
-			caller=self.app.root.ids.palette,
-			items = [{
-				"text": color,
-				'viewclass': 'OneLineListItem',
-				'on_release': lambda x=color: self.change_palette(x)
-				} for color in COLORS],
-			width_mult=2,
-			max_height=700,
-			position="bottom",
-			)
-		self.app.root.ids['screen_manager'].current = 'settings'
-		self.app.root.ids['nav_drawer'].set_state("close")
+			self.palette_menu = MDDropdownMenu(
+				caller=self.app.root.ids.palette,
+				items = [{
+					"text": color,
+					'viewclass': 'OneLineListItem',
+					'on_release': lambda x=color: self.change_palette(x)
+					} for color in COLORS],
+				width_mult=2,
+				max_height=700,
+				position="bottom",
+				)
+			self.app.root.ids['screen_manager'].current = 'settings'
+			self.app.root.ids['nav_drawer'].set_state("close")
+		except Exception as e:
+			debug(e)
 
 
 	def change_theme(self):

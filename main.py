@@ -20,8 +20,14 @@ class main_app(MDApp):
 		self.info = None
 		self.settings = Settings(self)
 		self.home = Home(self)
-		self.cah = CAH(PORT)
-		self.game = Game(self)
+		#notify(title=TITLE, message="home")
+		try:
+			self.cah = CAH(PORT)
+			#notify(title=TITLE, message="cah")
+			self.game = Game(self)
+			#notify(title=TITLE, message="game")
+		except Exception as e:
+			debug(e)
 		return Touch()
 
 

@@ -43,16 +43,15 @@ class Game:
 		self.players = []
 		self.winner = None
 
-
 	def open(self, mode):
 		self.mode = self.cah.mode = mode
 		self.set_defaults()
 		if mode == 'player':
-			self.cah.join()
+			self.cah.join('player', self.app.root.ids['ip_text'].text)
 			self.waiting_room = threading.Thread(target=self.start_game)
 			self.waiting_room.start()
 		elif mode == 'host':
-			self.cah.join('host')
+			self.cah.join('host', self.app.root.ids['ip_text'].text)
 		self.app.root.ids['screen_manager'].current = f"game_{self.mode}"
 
 

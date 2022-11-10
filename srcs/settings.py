@@ -76,3 +76,10 @@ try:
 except:
 	reset_settings()
 
+
+def	debug(s):
+	if PLATFORM == 'android':
+		notify(title=TITLE, message=str(s))
+	else:
+		print(s)
+

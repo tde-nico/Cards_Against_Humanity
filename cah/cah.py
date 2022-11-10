@@ -8,7 +8,7 @@ from time import sleep
 class CAH:
 	def __init__(self, port):
 		self.db = DB('cah/cah-cards-full-official.json')
-		self.mode = 'player' # 'host'
+		self.mode = 'home' # 'player' 'host'
 		self.client = None
 		self.player = None
 		self.udp_server = None
@@ -77,13 +77,13 @@ class CAH:
 		return text
 
 
-	def _join(self, mode):
+	def _join(self, mode, ip):
 		while self.is_shut:
 			sleep(0.1)
 		if mode == 'host':
 			self.start_server()
 		if not self.client:
-			self.client = Client('127.0.0.1', self.tcp_port,
+			self.client = Client(ip, self.tcp_port,
 				self.udp_port, self.port)
 			self.set_player('test')
 		if mode == 'host':
@@ -92,8 +92,8 @@ class CAH:
 			self.client.autojoin()
 		self.mode = mode
 
-	def join(self, mode='player'):
-		self.join_thread = threading.Thread(target=self._join, args=(mode,))
+	def join(self, mode='player', ip='127.0.0.1'):
+		self.join_thread = threading.Thread(target=self._join, args=(mode,ip,))
 		self.join_thread.start()
 	
 

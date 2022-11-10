@@ -243,6 +243,17 @@
 								pos_hint: {'x':0.9, 'y':0.2}
 								text: ''
 								on_release: app.settings.palette_menu.open()
+						MDBoxLayout:
+							padding: '10dp'
+							orientation: "horizontal"
+							size_hint_y: .1	
+							MDTextField:
+								id: ip_text
+								hint_text: "ip"
+								multiline: True	  
+								color_mode: 'primary'
+								helper_text_mode: "on_focus"
+								helper_text: "Paste here the ip"
 
 						MDBoxLayout:
 							size_hint_y: .5
@@ -273,7 +284,7 @@
 					size_hint_y: None
 					height: self.texture_size[1]
 				ScrollView:
-					MDList:
+					MDNavigationDrawerMenu:
 
 						MDNavigationDrawerItem:
 							text: "Home"
